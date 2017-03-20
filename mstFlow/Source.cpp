@@ -42,6 +42,7 @@ void createGraph(mstGraph strData, int numVer, int numEdge) { //creates an undir
 bool eofDataSet(int node, int pipe) {
 	if (node == 0 && pipe == 0)
 		return false;
+	return true;
 }
 
 
