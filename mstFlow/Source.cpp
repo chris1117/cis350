@@ -16,7 +16,37 @@
 
 using namespace std;
 
+struct mstGraph {
+
+	int vert;
+	int edges;
+	//int weight;
+	int mstEdge[];
+};
+
+void createGraph(mstGraph strData, int numVer, int numEdge) { //creates an undirected mstGraph
+	int ver1, ver2, weight, count = 0;
+	cin >> numVer >> numEdge;
+
+	if (!eofDataSet) {
+		for (int i = 1; i <= numEdge; i++) {
+			cin >> ver1 >> ver2 >> weight;
+
+			count++;
+			strData.mstEdge[i]; //FIXME
+
+		}
+	}
+}
+
+bool eofDataSet(int node, int pipe) {
+	if (node == 0 && pipe == 0)
+		return false;
+}
+
+
 int main() {
 
 	return 0;
 }
+
