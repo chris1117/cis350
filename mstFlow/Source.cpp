@@ -16,28 +16,43 @@
 
 using namespace std;
 
-struct mstGraph {
+struct mstEdge {
 
-	int vert;
-	int edges;
-	//int weight;
-	int mstEdge[];
+	int src;
+	int dest;
+	int weight;
+	//int mstEdge[];
 };
 
-void createGraph(mstGraph strData, int numVer, int numEdge) { //creates an undirected mstGraph
-	int ver1, ver2, weight, count = 0;
-	cin >> numVer >> numEdge;
+class mstGraph {
 
-	if (!eofDataSet) {
-		for (int i = 1; i <= numEdge; i++) {
-			cin >> ver1 >> ver2 >> weight;
+public:
 
-			count++;
-			strData.mstEdge[i]; //FIXME
+	void createGraph(mstGraph strData, int numVer, int numEdge) { //creates an undirected mstGraph
+		int ver1, ver2, wght, count = 0;
+		cin >> numVer >> numEdge;
 
+		while (!eofDataSet(numVer, numEdge)) {
+			
+			for (int i = 1; i <= numEdge; i++) {
+				cin >> ver1 >> ver2 >> wght;
+				edgeArr[i].src = ver1;
+				edgeArr[i].dest = ver2;
+				edgeArr[i].weight = wght;
+				
+				//count++;
+				//FIXME
+			}
 		}
 	}
-}
+
+	bool isCycle();
+	
+private:
+	mstEdge edgeArr[];
+};
+
+
 
 bool eofDataSet(int node, int pipe) {
 	if (node == 0 && pipe == 0)
