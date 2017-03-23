@@ -12,7 +12,8 @@
 */
 
 #include <iostream>
-#include <string>
+#include <algorithm>
+#include <vector>
 
 using namespace std;
 
@@ -36,20 +37,40 @@ public:
 			
 			for (int i = 1; i <= numEdge; i++) {
 				cin >> ver1 >> ver2 >> wght;
-				edgeArr[i].src = ver1;
-				edgeArr[i].dest = ver2;
-				edgeArr[i].weight = wght;
-				
+				edgeVec[i].src = ver1;
+				edgeVec[i].dest = ver2;
+				edgeVec[i].weight = wght;
 				//count++;
 				//FIXME
 			}
+
+			makeSet(edgeVec);			
 		}
 	}
 
-	bool isCycle();
+	void makeSet(vector<mstEdge> edgeSet) {
+
+		sort(edgeSet.begin(), edgeSet.end());
+	}
+
+	void unionSet(int parent[], int junc1, int junc2) {
+		
+		int vert1 = findSet(parent, junc1);
+		int vert2 = findSet(parent, junc2);
+		parent[junc1] = junc2;
+	}
+
+	int findSet(int parent[], int indx) {
+
+		if (parent[indx] == -1)
+			return indx;
+		return findSet(parent, parent[indx]);
+	}
+
+	int kruskMST();
 	
 private:
-	mstEdge edgeArr[];
+	vector <mstEdge> edgeVec;
 };
 
 
