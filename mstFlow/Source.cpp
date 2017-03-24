@@ -22,20 +22,54 @@ struct mstEdge {
 	int src;
 	int dest;
 	int weight;
+
+	mstEdge(int v = 0, int e = 0, int w = 0) {
+
+		src = v;
+		dest = e;
+		weight = w;
+	}
+
 	//int mstEdge[];
+
+	bool operator < (const mstEdge& rhs) {
+		return weight < rhs.weight;
+	}
+	
+	//sort(edgeSet.begin(), edgeSet.end())
+	
+};
+
+//struct orderWeight {
+//
+//	bool operator () (const mstEdge& ver1, const mstEdge& ver2) {
+//		return (ver1.weight < ver2.weight);
+//	}
+//
+//	//sort(edgeSet.begin(), edgeSet.end(), orderWeight());
+//	
+//
+//	
+//};
+
+struct makeSubSet {
+	
+	int parent;
+	int index;
 };
 
 class mstGraph {
 
 public:
 
-	void createGraph(mstGraph strData, int numVer, int numEdge) { //creates an undirected mstGraph
+	void createGraph(int numVer, int numEdge) { //creates an undirected mstGraph
+		
 		int ver1, ver2, wght, count = 0;
-		cin >> numVer >> numEdge;
+		
+		while (!eofDataSet(numVer, numEdge)) { //while data isn't 0, 0
+			edgeVec.resize(numEdge);
 
-		while (!eofDataSet(numVer, numEdge)) {
-			
-			for (int i = 1; i <= numEdge; i++) {
+			for (int i = 0; i < numEdge; i++) {
 				cin >> ver1 >> ver2 >> wght;
 				edgeVec[i].src = ver1;
 				edgeVec[i].dest = ver2;
@@ -43,46 +77,70 @@ public:
 				//count++;
 				//FIXME
 			}
-
-			makeSet(edgeVec);			
+			sortEdge(edgeVec);
+			//cin >> numVer >> numEdge;
+						
 		}
 	}
 
-	void makeSet(vector<mstEdge> edgeSet) {
+	void sortEdge(vector<mstEdge> edgeSet) {	//sort edges in non-decreasing order
 
 		sort(edgeSet.begin(), edgeSet.end());
 	}
-
-	void unionSet(int parent[], int junc1, int junc2) {
+	
+	//does union of on two sets of vertices
+	//uses union by rank
+	void unionSet(mstEdge parent[], int junc1, int junc2) {
 		
 		int vert1 = findSet(parent, junc1);
 		int vert2 = findSet(parent, junc2);
 		parent[junc1] = junc2;
 	}
 
-	int findSet(int parent[], int indx) {
+	//finds set of an element i
+	int findSet(makeSubSet subSet[], int indx) {
 
-		if (parent[indx] == -1)
-			return indx;
-		return findSet(parent, parent[indx]);
+		//finds and makes the root as parent of indx
+		//if root != index 
+		if (subSet[indx].parent != indx)
+			subSet[indx].parent = findSet(subSet, subSet[indx].parent);
+		return subSet[indx].parent;
 	}
 
-	int kruskMST();
+	int kruskMST(int numVer, int numEdge, mstEdge edgeSet) {
+		
+		groupSet.resize(0);
+		for (int i = 0; i < numVer; i++) {
+			groupSet[i].parent = i;
+			groupSet[i].index = -1;
+		}
+
+		while (numEdge < numVer - 1) {
+
+			int x = findSet(groupSet, edgeSet.src);
+			int y = findSet(groupSet, edgeSet.dest);
+		}
+	};
+
+	bool eofDataSet(int node, int pipe) {
+		if (node == 0 && pipe == 0)
+			return true;
+		return false;
+	}
 	
 private:
 	vector <mstEdge> edgeVec;
+	vector <makeSubSet> groupSet;
 };
 
-
-
-bool eofDataSet(int node, int pipe) {
-	if (node == 0 && pipe == 0)
-		return false;
-	return true;
-}
-
-
 int main() {
+
+	mstGraph graph;
+	mstEdge edge;
+	int numVer, numEdge;
+
+	cin >> numVer >> numEdge;
+	graph.createGraph(numVer, numEdge);
 
 	return 0;
 }
