@@ -17,6 +17,8 @@
 
 using namespace std;
 
+const int maxWeightCap = 10000;
+
 struct mstEdge {
 
 	int src;
@@ -77,28 +79,43 @@ public:
 				//count++;
 				//FIXME
 			}
-			sortEdge(edgeVec);
+			sort(edgeVec.begin(), edgeVec.end());
+			kruskMST(numVer, numEdge);
 			//cin >> numVer >> numEdge;
 						
 		}
 	}
 
-	void sortEdge(vector<mstEdge> edgeSet) {	//sort edges in non-decreasing order
+	//void sortEdge(vector<mstEdge> edgeSet) {	//sort edges in non-decreasing order
 
-		sort(edgeSet.begin(), edgeSet.end());
-	}
+	//	sort(edgeSet.begin(), edgeSet.end());
+	//}
 	
 	//does union of on two sets of vertices
 	//uses union by rank
-	void unionSet(mstEdge parent[], int junc1, int junc2) {
+	void unionSet(vector<makeSubSet>& subSet, int junc1, int junc2) {
 		
-		int vert1 = findSet(parent, junc1);
-		int vert2 = findSet(parent, junc2);
-		parent[junc1] = junc2;
+		int vert1 = findSet(subSet, junc1);
+		int vert2 = findSet(subSet, junc2);
+
+		//make the smaller subtree the child of the 
+		//largest subtree
+		if (subSet[vert1].index < subSet[vert2].index)
+			subSet[vert2].index = vert1;
+		else if (subSet[vert1].index > subSet[vert2].index)
+			subSet[vert2].index = vert1;
+		//if both parents are same, make one as root
+		//and decrement it's index by one
+		else {
+			subSet[vert2].index = vert1;
+			//subSet[vert1].parent--;
+		}
+		//subSet[junc1] = junc2;
 	}
 
 	//finds set of an element i
-	int findSet(makeSubSet subSet[], int indx) {
+	//determines which set an item with key indx is in
+	int findSet(vector<makeSubSet>& subSet, int indx) {
 
 		//finds and makes the root as parent of indx
 		//if root != index 
@@ -107,20 +124,60 @@ public:
 		return subSet[indx].parent;
 	}
 
-	int kruskMST(int numVer, int numEdge, mstEdge edgeSet) {
+	void kruskMST(int numVer, int numEdge) {
 		
-		groupSet.resize(0);
-		for (int i = 0; i < numVer; i++) {
+		int count = 0, minRange = INT_MAX, maxRange = 0;
+		int minCap;
+
+		groupSet.resize(numVer+1);
+
+		
+		for (int i = 0; i < numEdge; i++) {	//FIXME--> TRY i < numEdge - 2
+			initializeSubSet(numVer);
+			count = i;
+
+			while(count < (numVer - 1) + i) {
+
+				int x = findSet(groupSet, edgeVec[count].src);
+				int y = findSet(groupSet, edgeVec[count].dest);
+
+				if (x != y) {
+					unionSet(groupSet, x, y);
+					calcRange(minRange, maxRange, count);
+				}
+
+				
+
+				/*if ((groupSet[x].index != groupSet[y].index) || ((count + 1) == numVer )) {
+					unionSet(groupSet, x, y);
+				}*/
+
+				count++;
+			}
+		}
+	};
+
+	void initializeSubSet(int numVer) {
+
+		for (int i = 1; i <= numVer; i++) {
 			groupSet[i].parent = i;
 			groupSet[i].index = -1;
 		}
+	}
 
-		while (numEdge < numVer - 1) {
-
-			int x = findSet(groupSet, edgeSet.src);
-			int y = findSet(groupSet, edgeSet.dest);
-		}
-	};
+	void calcRange(int& minRange, int& maxRange, int count) {
+				
+		if (edgeVec[count].weight < minRange)
+			minRange = edgeVec[count].weight;
+		if (edgeVec[count].weight > maxRange)
+			maxRange = edgeVec[count].weight;		
+	}
+	
+	void findMinRange(int minRange, int maxRange, int& minCap) {
+		
+		if ((maxRange - minRange > minCap) && (maxRange - minRange) <= maxWeightCap)
+			minCap = maxRange - minRange;
+	}
 
 	bool eofDataSet(int node, int pipe) {
 		if (node == 0 && pipe == 0)
