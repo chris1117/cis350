@@ -56,8 +56,8 @@ struct mstEdge {
 
 struct makeSubSet {
 	
-	int parent;
 	int index;
+	int parent;	
 };
 
 class mstGraph {
@@ -95,19 +95,19 @@ public:
 	//uses union by rank
 	void unionSet(vector<makeSubSet>& subSet, int junc1, int junc2) {
 		
-		int vert1 = findSet(subSet, junc1);
-		int vert2 = findSet(subSet, junc2);
+		//int vert1 = findSet(subSet, junc1);
+		//int vert2 = findSet(subSet, junc2);
 
 		//make the smaller subtree the child of the 
 		//largest subtree
-		if (subSet[vert1].index < subSet[vert2].index)
-			subSet[vert2].index = vert1;
-		else if (subSet[vert1].index > subSet[vert2].index)
-			subSet[vert2].index = vert1;
+		if (subSet[junc1].parent < subSet[junc2].parent)
+			subSet[junc2].parent = junc1;
+		else if (subSet[junc1].parent > subSet[junc2].parent)
+			subSet[junc2].parent = junc1;
 		//if both parents are same, make one as root
 		//and decrement it's index by one
 		else {
-			subSet[vert2].index = vert1;
+			subSet[junc2].parent = junc1;
 			//subSet[vert1].parent--;
 		}
 		//subSet[junc1] = junc2;
@@ -119,9 +119,9 @@ public:
 
 		//finds and makes the root as parent of indx
 		//if root != index 
-		if (subSet[indx].parent != indx)
+		if (subSet[indx].parent > 0)	//subSet[indx].parent != indx-->prev
 			subSet[indx].parent = findSet(subSet, subSet[indx].parent);
-		return subSet[indx].parent;
+		return subSet[indx].index;
 	}
 
 	void kruskMST(int numVer, int numEdge) {
@@ -132,7 +132,7 @@ public:
 		groupSet.resize(numVer+1);
 
 		
-		for (int i = 0; i < numEdge; i++) {	//FIXME--> TRY i < numEdge - 2
+		for (int i = 0; i < numEdge - 2; i++) {	//FIXME--> TRY i < numEdge - 2
 			initializeSubSet(numVer);
 			count = i;
 
@@ -160,8 +160,8 @@ public:
 	void initializeSubSet(int numVer) {
 
 		for (int i = 1; i <= numVer; i++) {
-			groupSet[i].parent = i;
-			groupSet[i].index = -1;
+			groupSet[i].index = i;
+			groupSet[i].parent = -1;
 		}
 	}
 
