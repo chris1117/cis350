@@ -32,27 +32,10 @@ struct mstEdge {
 		weight = w;
 	}
 
-	//int mstEdge[];
-
 	bool operator < (const mstEdge& rhs) {
 		return weight < rhs.weight;
-	}
-	
-	//sort(edgeSet.begin(), edgeSet.end())
-	
+	}	
 };
-
-//struct orderWeight {
-//
-//	bool operator () (const mstEdge& ver1, const mstEdge& ver2) {
-//		return (ver1.weight < ver2.weight);
-//	}
-//
-//	//sort(edgeSet.begin(), edgeSet.end(), orderWeight());
-//	
-//
-//	
-//};
 
 struct makeSubSet {
 	
@@ -75,29 +58,18 @@ public:
 				cin >> ver1 >> ver2 >> wght;
 				edgeVec[i].src = ver1;
 				edgeVec[i].dest = ver2;
-				edgeVec[i].weight = wght;
-				//count++;
-				//FIXME
+				edgeVec[i].weight = wght;				
 			}
 			sort(edgeVec.begin(), edgeVec.end());
 			kruskMST(numVer, numEdge);
-			//cin >> numVer >> numEdge;
-						
+			cin >> numVer >> numEdge;						
 		}
 	}
 
-	//void sortEdge(vector<mstEdge> edgeSet) {	//sort edges in non-decreasing order
-
-	//	sort(edgeSet.begin(), edgeSet.end());
-	//}
-	
 	//does union of on two sets of vertices
 	//uses union by rank
 	void unionSet(vector<makeSubSet>& subSet, int junc1, int junc2) {
 		
-		//int vert1 = findSet(subSet, junc1);
-		//int vert2 = findSet(subSet, junc2);
-
 		//make the smaller subtree the child of the 
 		//largest subtree
 		if (subSet[junc1].parent < subSet[junc2].parent)
@@ -106,11 +78,8 @@ public:
 			subSet[junc2].parent = junc1;
 		//if both parents are same, make one as root
 		//and decrement it's index by one
-		else {
+		else 
 			subSet[junc2].parent = junc1;
-			//subSet[vert1].parent--;
-		}
-		//subSet[junc1] = junc2;
 	}
 
 	//finds set of an element i
@@ -119,21 +88,24 @@ public:
 
 		//finds and makes the root as parent of indx
 		//if root != index 
-		if (subSet[indx].parent > 0)	//subSet[indx].parent != indx-->prev
+		if (subSet[indx].parent > 0) {	//subSet[indx].parent != indx-->prev
 			subSet[indx].parent = findSet(subSet, subSet[indx].parent);
+			return subSet[indx].parent;
+		}
 		return subSet[indx].index;
 	}
 
 	void kruskMST(int numVer, int numEdge) {
 		
-		int count = 0, minRange = INT_MAX, maxRange = 0;
-		int minCap;
-
+		int count = 0, minWeight, minCap = INT_MAX;
+		int minWRange, maxWRange;
+		bool isCycle;
 		groupSet.resize(numVer+1);
-
-		
+				
 		for (int i = 0; i < numEdge - 2; i++) {	//FIXME--> TRY i < numEdge - 2
 			initializeSubSet(numVer);
+			minWRange = INT_MAX, maxWRange = 0;
+			isCycle = false;
 			count = i;
 
 			while(count < (numVer - 1) + i) {
@@ -143,18 +115,16 @@ public:
 
 				if (x != y) {
 					unionSet(groupSet, x, y);
-					calcRange(minRange, maxRange, count);
+					findMinMax(minWRange, maxWRange, count);
 				}
-
-				
-
-				/*if ((groupSet[x].index != groupSet[y].index) || ((count + 1) == numVer )) {
-					unionSet(groupSet, x, y);
-				}*/
-
+				else
+					isCycle = true;
 				count++;
 			}
+			if(!isCycle)
+				minWeight = findMinWeight(minWRange, maxWRange, minCap);
 		}
+		strMinWeight.push_back(minWeight);
 	};
 
 	void initializeSubSet(int numVer) {
@@ -165,7 +135,7 @@ public:
 		}
 	}
 
-	void calcRange(int& minRange, int& maxRange, int count) {
+	void findMinMax(int& minRange, int& maxRange, int count) {
 				
 		if (edgeVec[count].weight < minRange)
 			minRange = edgeVec[count].weight;
@@ -173,10 +143,11 @@ public:
 			maxRange = edgeVec[count].weight;		
 	}
 	
-	void findMinRange(int minRange, int maxRange, int& minCap) {
+	int findMinWeight(int minRange, int maxRange, int& minCap) {
 		
-		if ((maxRange - minRange > minCap) && (maxRange - minRange) <= maxWeightCap)
+		if ((maxRange - minRange < minCap) && (maxRange - minRange) <= maxWeightCap)
 			minCap = maxRange - minRange;
+		return minCap;
 	}
 
 	bool eofDataSet(int node, int pipe) {
@@ -184,10 +155,16 @@ public:
 			return true;
 		return false;
 	}
+
+	void printMinWeight() {
+		for (int i = 0; i < strMinWeight.size(); i++)
+			cout << strMinWeight[i] << endl;
+	}
 	
 private:
 	vector <mstEdge> edgeVec;
 	vector <makeSubSet> groupSet;
+	vector <int> strMinWeight;
 };
 
 int main() {
@@ -198,6 +175,7 @@ int main() {
 
 	cin >> numVer >> numEdge;
 	graph.createGraph(numVer, numEdge);
+	graph.printMinWeight();
 
 	return 0;
 }
