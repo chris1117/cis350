@@ -60,10 +60,14 @@ public:
 				edgeVec[i].dest = ver2;
 				edgeVec[i].weight = wght;				
 			}
-			sort(edgeVec.begin(), edgeVec.end());
-			kruskMST(numVer, numEdge);
+			sort(edgeVec.begin(), edgeVec.end());	//O(elogE)
+			/*if (numEdge < numVer)
+				strMinWeight.push_back(-1);
+			else */
+				kruskMST(numVer, numEdge);	
 			cin >> numVer >> numEdge;						
 		}
+		printMinWeight();
 	}
 
 	//does union of on two sets of vertices
@@ -98,18 +102,18 @@ public:
 	void kruskMST(int numVer, int numEdge) {
 		
 		int count = 0, minWeight, minCap = INT_MAX;
-		int minWRange, maxWRange;
-		bool isCycle;
+		int minWRange, maxWRange, numPar = 0;
+		bool isCycle, inComplete;
 		groupSet.resize(numVer+1);
 				
-		for (int i = 0; i < numEdge - 2; i++) {	//FIXME--> TRY i < numEdge - 2
+		for (int i = 0; i < numEdge-2 /*- i*/; i++) {	//FIXME--> TRY i < numEdge - 2
 			initializeSubSet(numVer);
 			minWRange = INT_MAX, maxWRange = 0;
-			isCycle = false;
+			isCycle = false, inComplete;
 			count = i;
-
+			
 			while(count < (numVer - 1) + i) {
-
+			//while (numEdge - i >= numVer - 1){
 				int x = findSet(groupSet, edgeVec[count].src);
 				int y = findSet(groupSet, edgeVec[count].dest);
 
@@ -121,10 +125,16 @@ public:
 					isCycle = true;
 				count++;
 			}
+
 			if(!isCycle)
 				minWeight = findMinWeight(minWRange, maxWRange, minCap);
+
+			inComplete = isComplete(groupSet, numPar);
 		}
-		strMinWeight.push_back(minWeight);
+		if (!inComplete)
+			strMinWeight.push_back(minWeight);
+		else
+			strMinWeight.push_back(-1);
 	};
 
 	void initializeSubSet(int numVer) {
@@ -148,6 +158,16 @@ public:
 		if ((maxRange - minRange < minCap) && (maxRange - minRange) <= maxWeightCap)
 			minCap = maxRange - minRange;
 		return minCap;
+	}
+
+	bool isComplete(vector<makeSubSet> subSets, int numPar) {
+		
+		for (int i = 1; i < subSets.size(); i++) 
+			if (subSets[i].parent < 0) 
+				numPar++;
+		if(numPar > 1)
+			return true;
+		return false;
 	}
 
 	bool eofDataSet(int node, int pipe) {
@@ -175,8 +195,7 @@ int main() {
 
 	cin >> numVer >> numEdge;
 	graph.createGraph(numVer, numEdge);
-	graph.printMinWeight();
+	//graph.printMinWeight();
 
 	return 0;
 }
-
